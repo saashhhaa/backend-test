@@ -1,0 +1,53 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+export const SignUp = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [info, setInfo] = useState("");
+   const navigate = useNavigate();
+
+  const signUp = async () => {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    setUsername("");
+    setPassword("");
+
+    const data = await res.json();
+    setInfo(data.message || data.error);
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
+
+     navigate("/homepage", { state: { username } });
+  };
+
+  return (
+    <>
+      <h1 className="title">Регистрация</h1>
+      <input
+        onChange={(e) => setUsername(e.target.value)}
+        value={username}
+        type="text"
+        placeholder="username"
+        required
+      />
+      <input
+        onChange={(e) => setPassword(e.target.value)}
+        value={password}
+        type="password"
+        placeholder="password"
+        required
+      />
+      <button onClick={signUp}>Создать аккаунт</button>
+      <p>{info}</p>
+      <p>
+        Уже есть аккаунт?<Link to="/logIn">Войти </Link>
+      </p>
+    </>
+  );
+};
